@@ -1,0 +1,6 @@
+target/*
+custom-copy.xml
+bin/*
+.settings
+tasks.json
+.vscode/*
