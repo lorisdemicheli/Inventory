@@ -70,7 +70,7 @@ public class Skull {
 		if (getVersion() > 12) {
 			skull = new ItemStack(Material.valueOf("PLAYER_HEAD"));
 		} else {
-			skull = new ItemStack(Objects.<Material>requireNonNull(Material.getMaterial("SKULL_ITEM")), 1,
+			skull = new ItemStack(Material.getMaterial("SKULL_ITEM"), 1,
 					(short) SkullType.PLAYER.ordinal());
 		}
 		return skull;
@@ -86,12 +86,11 @@ public class Skull {
 		String signature;
 		String value;
 		try {
-			Object entityPlayer = player.getClass().getMethod("getHandle", new Class[0]).invoke(player, new Object[0]);
-			Method getProfileMethod = entityPlayer.getClass().getMethod("getProfile", new Class[0]);
-			GameProfile gameProfile = (GameProfile) getProfileMethod.invoke(entityPlayer, new Object[0]);
+			Object entityPlayer = ReflectionUtils.callMethod(player, "getHandle");
+			GameProfile gameProfile = (GameProfile) ReflectionUtils.callMethod(entityPlayer, "getProfile");
 			Property property = gameProfile.getProperties().get("textures").iterator().next();
 			signature = property.getSignature();
-			value = property.getSignature();
+			value = property.getValue();
 			cache.put(player.getName(), property.getValue());
 		} catch (Exception e) {
 			signature = FIRMA;

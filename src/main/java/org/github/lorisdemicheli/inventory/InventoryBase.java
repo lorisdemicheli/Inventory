@@ -1,5 +1,7 @@
 package org.github.lorisdemicheli.inventory;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,6 +21,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.github.lorisdemicheli.inventory.util.Ask;
 import org.github.lorisdemicheli.inventory.util.DataType;
+import org.github.lorisdemicheli.inventory.util.ReflectionUtils;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftContainer;
 
@@ -36,9 +39,9 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 	private InventoryBase<?> previous;
 	private Map<Integer, ItemStack> items = new HashMap<>();
 	private PersistentDataType<?, T> dataType;
-	
-	protected final Map<String,String> placeHolder = new HashMap<>();
-	
+
+	protected final Map<String, String> placeHolder = new HashMap<>();
+
 	protected Plugin plugin;
 
 	public InventoryBase(Plugin plugin) {
@@ -51,7 +54,7 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 		this(plugin);
 		this.inventory = inventory;
 	}
-	
+
 	public InventoryBase(Plugin plugin, InventoryBase<?> previous) {
 		this(plugin, previous.getInventory());
 		previous.setSub(this);
@@ -64,7 +67,7 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 	protected abstract boolean autoUpdate();
 
 	protected abstract String title();
-	
+
 	protected abstract void placeItem(HumanEntity human);
 
 	public void previusInv(HumanEntity human) {
@@ -88,8 +91,7 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 		if (sub != null) {
 			sub.update(human);
 		} else {
-			Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin,
-					() -> updateAsync(human));
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> updateAsync(human));
 		}
 	}
 
@@ -115,7 +117,7 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 	protected void clearItem() {
 		items.clear();
 	}
-	
+
 	protected Map<Integer, ItemStack> getItems() {
 		return items;
 	}
@@ -159,8 +161,8 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 	public void open(HumanEntity human) {
 		if (previous == null) {
 			if (autoUpdate()) {
-				updateInvId = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin,
-						() -> update(human), 0, 10);
+				updateInvId = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> update(human),
+						0, 10);
 			} else {
 				update(human);
 			}
@@ -186,19 +188,28 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 	}
 
 	protected void renameInventory() {
-		Player p = (Player) inventory.getViewers().get(0);
-		EntityPlayer ep = ((CraftPlayer) p).getHandle();
-		PacketPlayOutOpenWindow packet = new PacketPlayOutOpenWindow(ep.activeContainer.windowId,
-				CraftContainer.getNotchInventoryType(p.getOpenInventory().getTopInventory()),
-				new ChatComponentText(replacePlaceHolder(title())));
-		ep.playerConnection.sendPacket(packet);
+		Player player = (Player) inventory.getViewers().get(0);
+		try {
+			Object entityPlayer = ReflectionUtils.callMethod(player, "getHandle");
+			Object activeContainer = ReflectionUtils.fieldValue(entityPlayer, "activeContainer");
+			Object windowId = ReflectionUtils.fieldValue(activeContainer, "windowId");
+			Object craftContainer = ReflectionUtils.callStaticMethod(ReflectionUtils.getCBVClass("inventory.CraftContainer"),
+					"getNotchInventoryType",inventory);
+			Object chat = ReflectionUtils.newInstance(ReflectionUtils.getMVClass("ChatComponentText"),replacePlaceHolder(title()));
+			Object packet = ReflectionUtils.newInstance(ReflectionUtils.getMVClass("PacketPlayOutOpenWindow"), windowId,
+					craftContainer, chat);
+			Object playerConnection = ReflectionUtils.fieldValue(entityPlayer, "playerConnection");
+			ReflectionUtils.callMethod(playerConnection, "sendPacket", packet);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-	
+
 	protected String replacePlaceHolder(String str) {
 		Iterator<Entry<String, String>> row = placeHolder.entrySet().iterator();
 		while (row.hasNext()) {
 			Entry<String, String> value = row.next();
-			if(str.contains(value.getKey())) {
+			if (str.contains(value.getKey())) {
 				str = str.replace(value.getKey(), value.getValue());
 			}
 		}
