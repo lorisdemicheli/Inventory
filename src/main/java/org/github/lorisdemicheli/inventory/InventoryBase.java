@@ -1,7 +1,5 @@
 package org.github.lorisdemicheli.inventory;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,12 +20,6 @@ import org.bukkit.plugin.Plugin;
 import org.github.lorisdemicheli.inventory.util.Ask;
 import org.github.lorisdemicheli.inventory.util.DataType;
 import org.github.lorisdemicheli.inventory.util.ReflectionUtils;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftContainer;
-
-import net.minecraft.server.v1_16_R3.ChatComponentText;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.PacketPlayOutOpenWindow;
 
 public abstract class InventoryBase<T> implements InventoryHolder {
 
