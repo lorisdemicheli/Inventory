@@ -1,11 +1,11 @@
 package org.github.lorisdemicheli.inventory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
@@ -24,12 +24,12 @@ import org.github.lorisdemicheli.inventory.util.ReflectionUtils;
 public abstract class InventoryBase<T> implements InventoryHolder {
 
 	private Inventory inventory;
-	private int updateInvId;
+	private Integer updateInvId;
 	private NamespacedKey key;
 	private NamespacedKey stringKey;
 	private InventoryBase<?> sub;
 	private InventoryBase<?> previous;
-	private Map<Integer, ItemStack> items = new HashMap<>();
+	private Map<Integer, ItemStack> items = Collections.synchronizedMap(new HashMap<>());
 	private PersistentDataType<?, T> dataType;
 
 	protected final Map<String, String> placeHolder = new HashMap<>();
@@ -63,12 +63,14 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 	protected abstract void placeItem(HumanEntity human);
 
 	public void previusInv(HumanEntity human) {
+		previous.stopAutoUpdate();
 		previous.setSub(null);
 		previous.renameInventory();
 		previous.update(human);
 	}
 
 	public void openPreviousInv(HumanEntity human) {
+		previous.stopAutoUpdate();
 		previous.setSub(null);
 		previous.open(human);
 		previous.renameInventory();
@@ -76,14 +78,26 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 
 	protected void updateAsync(HumanEntity human) {
 		placeItem(human);
+		updateAsyncBeforeSync(human);
 		Bukkit.getServer().getScheduler().runTask(plugin, () -> updateSync(human));
 	}
+
+	protected void updateAsyncBeforeSync(HumanEntity human) {}
 
 	public final void update(HumanEntity human) {
 		if (sub != null) {
 			sub.update(human);
 		} else {
-			Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> updateAsync(human));
+			if (autoUpdate()) {
+				if (previousHaveSchedule() != null || updateInvId != null) {
+					Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> updateAsync(human));
+				} else {
+					updateInvId = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin,
+							() -> update(human), 0, 10);
+				}
+			} else {
+				Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> updateAsync(human));
+			}
 		}
 	}
 
@@ -152,21 +166,54 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 
 	public void open(HumanEntity human) {
 		if (previous == null) {
-			if (autoUpdate()) {
-				updateInvId = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> update(human),
-						0, 10);
-			} else {
-				update(human);
-			}
+			update(human);
 			human.openInventory(inventory);
 		} else {
 			previous.open(human);
 		}
 	}
+	
+	public Integer subHaveSchedule() {
+		if(updateInvId != null) {
+			return  updateInvId;
+		} else if(sub != null) {
+			return sub.subHaveSchedule();
+		}
+		return null;
+	}
 
+	private void stopAutoUpdate() {
+		if(!autoUpdate()) {
+		Integer ida = subHaveSchedule();
+			if(ida != null) {
+				Bukkit.getServer().getScheduler().cancelTask(sub.updateInvId);
+			}
+		
+		}
+		//if (!autoUpdate()) {
+			/*Integer id = previousHaveSchedule();
+			if (id != null) {
+				Bukkit.getServer().getScheduler().cancelTask(sub.updateInvId);
+				sub.updateInvId = null;
+			}*/
+		//}
+	}
+
+	private Integer previousHaveSchedule() {
+		if (previous != null) {
+			return previous.previousHaveSchedule();
+		}
+		return updateInvId;
+	}
+	
 	public void onClose() {
-		if (autoUpdate()) {
+		if (updateInvId == null) {
+			if (sub != null) {
+				sub.onClose();
+			}
+		} else {
 			Bukkit.getServer().getScheduler().cancelTask(updateInvId);
+			updateInvId = null;
 		}
 	}
 
@@ -185,9 +232,10 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 			Object entityPlayer = ReflectionUtils.callMethod(player, "getHandle");
 			Object activeContainer = ReflectionUtils.fieldValue(entityPlayer, "activeContainer");
 			Object windowId = ReflectionUtils.fieldValue(activeContainer, "windowId");
-			Object craftContainer = ReflectionUtils.callStaticMethod(ReflectionUtils.getCBVClass("inventory.CraftContainer"),
-					"getNotchInventoryType",inventory);
-			Object chat = ReflectionUtils.newInstance(ReflectionUtils.getMVClass("ChatComponentText"),replacePlaceHolder(title()));
+			Object craftContainer = ReflectionUtils.callStaticMethod(
+					ReflectionUtils.getCBVClass("inventory.CraftContainer"), "getNotchInventoryType", inventory);
+			Object chat = ReflectionUtils.newInstance(ReflectionUtils.getMVClass("ChatComponentText"),
+					replacePlaceHolder(title()));
 			Object packet = ReflectionUtils.newInstance(ReflectionUtils.getMVClass("PacketPlayOutOpenWindow"), windowId,
 					craftContainer, chat);
 			Object playerConnection = ReflectionUtils.fieldValue(entityPlayer, "playerConnection");

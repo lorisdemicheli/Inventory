@@ -32,9 +32,6 @@ public class PagedImplementationV2 extends PagedInventory<PlayerType> {
 
 	@Override
 	protected ItemStack itemList(PlayerType element) {
-		//return ItemUtil.loreItem(Skull.getPlayerSkull(element.getPlayer()), element.getPlayer().getName(),1);
-		//return ItemUtil.loreItem(SkullV2.getHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjBhMGFjNjgwNjcwNGQ5OWJmZWMxNTBhZGZjNzlkMmY1NTI4NmY1ODgzNjA0MzkzM2Q4MWVkOWY4MGMwYmExOSJ9fX0="), element.getPlayer().getName(),1);
-		//return SkullV2.create(null,"ewogICJ0aW1lc3RhbXAiIDogMTYyMjEzNDgyODk5OCwKICAicHJvZmlsZUlkIiA6ICI3ZjUxODllYjI2MTk0MzBjYmM4OGU4NGY4ZGYwNTU3OCIsCiAgInByb2ZpbGVOYW1lIiA6ICJ4TG9yaXM5OSIsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85NDQ3ZGFjZjc5NzZhODQwYWZmY2E1NTFkODE1OTgwMzViNzg2YjIwNjdhYTVkMjIzMTc1OTdmNmEwMDk4MzM1IgogICAgfQogIH0KfQ==");
 		return Skull.getHead(element.getPlayer());
 	}
 
@@ -77,7 +74,6 @@ public class PagedImplementationV2 extends PagedInventory<PlayerType> {
 	@Override
 	protected void placeItem(HumanEntity human) {
 		setItem(49, setStringKey(ItemUtil.basicItem(Material.LOOM, "Back", 1), "back"));
-		super.placeItem(human);
 	}
 
 }

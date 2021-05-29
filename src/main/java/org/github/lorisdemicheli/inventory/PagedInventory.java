@@ -54,10 +54,12 @@ public abstract class PagedInventory<E> extends InventoryBase<E> {
 	}
 
 	@Override
-	protected void placeItem(HumanEntity human) {
+	protected void updateAsyncBeforeSync(HumanEntity human) {
 		elements = updateElements(human);
 		int size = getInventory().getSize() - 9;
-		checkItem(size);
+		if(checkItem(size)) {
+			throw new IllegalArgumentException("Wrong position for one or more item");
+		}
 		if (elements != null) {
 			int skip = page * size;
 			if (skip + size < elements.size()) {
@@ -75,14 +77,15 @@ public abstract class PagedInventory<E> extends InventoryBase<E> {
 		}
 	}
 	
-	private void checkItem(int size) {
+	private boolean checkItem(int size) {
 		Iterator<Entry<Integer, ItemStack>> value = getItems().entrySet().iterator();
 		while (value.hasNext()) {
 			Entry<Integer, ItemStack> itempos = value.next();
 			if(itempos.getKey() < size || itempos.getKey() == 45 || itempos.getKey() == 53) {
-				throw new IllegalArgumentException("Wrong position " + itempos.getKey());
+				return true;
 			}
 		}
+		return false;
 	}
 
 	private ItemStack getArrowRight() {

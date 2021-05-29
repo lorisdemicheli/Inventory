@@ -78,7 +78,6 @@ public class PagedImplementation extends PagedInventory<String> {
 	@Override
 	protected void placeItem(HumanEntity human) {
 		setItem(49, setStringKey(ItemUtil.basicItem(Material.LOOM, "Back", 1), "back"));
-		super.placeItem(human);
 	}
 
 }

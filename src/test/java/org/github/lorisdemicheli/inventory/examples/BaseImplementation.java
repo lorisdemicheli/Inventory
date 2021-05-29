@@ -32,6 +32,10 @@ public class BaseImplementation extends InventoryBase<String>{
 			InventoryBase<?> invV2 = new PagedImplementationV2(plugin,this);
 			invV2.update(event.getWhoClicked());
 			break;
+		case "number":
+			InventoryBase<?> invNumber = new PagedWithPageActive(plugin,this);
+			invNumber.update(event.getWhoClicked());
+			break;
 		}
 	}
 
@@ -50,6 +54,7 @@ public class BaseImplementation extends InventoryBase<String>{
 		setItem(0, ItemUtil.basicItem(Material.POPPY, "Click for a greeting", 1), "greet");
 		setItem(1, ItemUtil.loreItem(Material.CAKE, "Click", 1,Arrays.asList("Open","paged","inventory")), "paged");
 		setItem(2, ItemUtil.loreItem(Material.CAKE, "Click", 1,Arrays.asList("Open","paged","inventory","V2")), "pagedV2");
+		setItem(3, ItemUtil.loreItem(Material.CAKE, "Click", 1,Arrays.asList("Number")), "number");
 	}
 
 }
