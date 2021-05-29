@@ -190,13 +190,6 @@ public abstract class InventoryBase<T> implements InventoryHolder {
 			}
 		
 		}
-		//if (!autoUpdate()) {
-			/*Integer id = previousHaveSchedule();
-			if (id != null) {
-				Bukkit.getServer().getScheduler().cancelTask(sub.updateInvId);
-				sub.updateInvId = null;
-			}*/
-		//}
 	}
 
 	private Integer previousHaveSchedule() {
