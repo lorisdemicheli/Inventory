@@ -1,4 +1,4 @@
-package org.github.lorisdemicheli.inventory.listener;
+package com.github.lorisdemicheli.inventory.listener;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,7 +9,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.github.lorisdemicheli.inventory.InventoryBase;
+
+import com.github.lorisdemicheli.inventory.util.BaseInventory;
 
 
 public class InventoryListener implements Listener {
@@ -30,19 +31,19 @@ public class InventoryListener implements Listener {
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
 		Inventory inv = event.getClickedInventory();
-		
 		if (inv == null) {
 			return;
 		}
-			
+
 		InventoryHolder holder = event.getClickedInventory().getHolder();
 		
-		if (holder instanceof InventoryBase) {
-			InventoryBase<?> base = (InventoryBase<?>) holder;
+		if (holder instanceof BaseInventory) {
+			BaseInventory base = (BaseInventory) holder;
 			ItemStack item = event.getCurrentItem();
 			
 			if (item != null) {			
-				base.onItemSelectedChoice(event, item);
+				base.onItemSelected(event, item);
+				event.setCancelled(base.cancelledClick());
 			}
 			
 			return;
@@ -52,15 +53,15 @@ public class InventoryListener implements Listener {
 	@EventHandler
 	public void onInventoryCloseEvent(InventoryCloseEvent event) {
 		InventoryHolder holder = event.getInventory().getHolder();
-		if (holder instanceof InventoryBase) {
-			InventoryBase<?> base = (InventoryBase<?>) holder;
+		if (holder instanceof BaseInventory) {
+			BaseInventory base = (BaseInventory) holder;
 			base.onClose();
 		}
 	}
 
 	@EventHandler
 	public void onPlayerAnimationEvent(PlayerAnimationEvent event) {
-		if (event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof InventoryBase) {
+		if (event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof BaseInventory) {
 			event.setCancelled(true);
 		}
 	}

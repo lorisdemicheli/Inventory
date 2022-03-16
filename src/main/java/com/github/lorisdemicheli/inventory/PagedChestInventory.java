@@ -1,39 +1,40 @@
-package org.github.lorisdemicheli.inventory;
+package com.github.lorisdemicheli.inventory;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.github.lorisdemicheli.inventory.util.CustomHead;
 
+import com.github.lorisdemicheli.inventory.util.BaseInventory;
+import com.github.lorisdemicheli.inventory.util.CustomHead;
 
-public abstract class PagedInventory<E> extends InventoryBase<E> {
-
+public abstract class PagedChestInventory<E extends Serializable> extends ChestInventory<E>{
+	
 	private List<E> elements;
 	private int page = 0;
 
-	public PagedInventory(Plugin plugin) {
-		super(plugin);
+	public PagedChestInventory(BaseInventory previous, int size) {
+		super(previous, size);
 	}
 
-	public PagedInventory(Plugin plugin, Inventory inv) {
-		super(plugin, inv);
-	}
-	
-	public PagedInventory(Plugin plugin, InventoryBase<?> prevoius) {
-		super(plugin, prevoius);
+	public PagedChestInventory(Plugin plugin,int size) {
+		super(plugin, size);
 	}
 
-	protected abstract List<E> updateElements(HumanEntity human);
+	protected abstract List<E> listElements(HumanEntity human);
 
-	protected abstract ItemStack itemList(E element);
+	protected abstract ItemStack itemList(HumanEntity human,E element);
 
 	protected abstract void onItemSelectedList(E element, InventoryClickEvent event);
+	
+	@Override
+	public void placeItem(HumanEntity human) {}
 
 	@Override
 	public void onItemSelected(InventoryClickEvent event, ItemStack item) {
@@ -55,44 +56,48 @@ public abstract class PagedInventory<E> extends InventoryBase<E> {
 
 	@Override
 	protected void updateAsyncBeforeSync(HumanEntity human) {
-		elements = updateElements(human);
-		int size = getInventory().getSize() - 9;
-		if(checkItem(size)) {
+		elements = listElements(human);
+		int realSize = getInventory().getSize();
+		int size = realSize - 9;
+		if(checkItem(realSize)) {
 			throw new IllegalArgumentException("Wrong position for one or more item");
 		}
 		if (elements != null) {
 			int skip = page * size;
 			if (skip + size < elements.size()) {
-				setItem(53, setStringKey(getArrowRight(), "%freccia%destra%"));
+				setItem(realSize-1, setStringKey(getArrowRight(), "%freccia%destra%"));
 			}
 			if (page > 0) {
-				setItem(45, setStringKey(getArrowLeft(), "%freccia%sinistra%"));
+				setItem(realSize-9, setStringKey(getArrowLeft(), "%freccia%sinistra%"));
 			}
 			for (int i = 0; i < size; i++) {
 				if (skip + i < elements.size()) {
 					E current = elements.get(skip + i);
-					setItem(i, itemList(current), current);
+					setItem(i, itemList(human,current), current);
 				}
 			}
 		}
 	}
 	
 	private boolean checkItem(int size) {
+		if(size==9) return true;
+		
 		Iterator<Entry<Integer, ItemStack>> value = getItems().entrySet().iterator();
 		while (value.hasNext()) {
 			Entry<Integer, ItemStack> itempos = value.next();
-			if(itempos.getKey() < size || itempos.getKey() == 45 || itempos.getKey() == 53) {
+			if(itempos.getKey() < (size-10) || itempos.getKey() == (size-9) || itempos.getKey() == (size-1)) {
+				Bukkit.getServer().getLogger().warning("POS  " + itempos.getKey() + " " + itempos.getValue());
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private ItemStack getArrowRight() {
+	protected ItemStack getArrowRight() {
 		return CustomHead.arrowRight("NEXT");
 	}
 
-	private ItemStack getArrowLeft() {
+	protected ItemStack getArrowLeft() {
 		return CustomHead.arrowLeft("BACK");
 	}
 

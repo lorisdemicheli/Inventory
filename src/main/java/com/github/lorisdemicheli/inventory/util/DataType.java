@@ -1,14 +1,12 @@
-package org.github.lorisdemicheli.inventory.util;
+package com.github.lorisdemicheli.inventory.util;
 
-import java.lang.instrument.IllegalClassFormatException;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.persistence.PersistentDataType.PrimitivePersistentDataType;
-import org.github.lorisdemicheli.inventory.entity.EntitySerializable;
+
+import com.github.lorisdemicheli.inventory.entity.AutoPersistentDataType;
 
 public class DataType {
 
@@ -25,10 +23,8 @@ public class DataType {
 	public static final PersistentDataType<int[], int[]> INTEGER_ARRAY = PrimitivePersistentDataType.INTEGER_ARRAY;
 	public static final PersistentDataType<long[], long[]> LONG_ARRAY = PrimitivePersistentDataType.LONG_ARRAY;
 
-	private static final List<PersistentDataType<?, ?>> types = new ArrayList<>();
-
 	@SuppressWarnings("unchecked")
-	public static <T> PersistentDataType<?, T> getType(T type) {
+	public static <T extends Serializable> PersistentDataType<?, T> getType(T type) {
 		for (Field f : DataType.class.getFields()) {
 			if (Modifier.isPublic(f.getModifiers())) {
 				try {
@@ -36,23 +32,9 @@ public class DataType {
 					if (typeint.getComplexType().getTypeName().equals(type.getClass().getCanonicalName())) {
 						return (PersistentDataType<?, T>) typeint;
 					}
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-				}
+				} catch (IllegalArgumentException | IllegalAccessException e) {	}
 			}
 		}
-		for (PersistentDataType<?, ?> typeint : types) {
-			if (typeint.getComplexType().getTypeName().equals(type.getClass().getCanonicalName())) {
-				return (PersistentDataType<?, T>) typeint;
-			}
-		}
-		return null;
-	}
-	
-	public static void registerType(Class<? extends EntitySerializable<?>> clazz) throws IllegalClassFormatException {
-		try {
-			types.add(clazz.newInstance().getPersistentDataType());
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new IllegalClassFormatException();
-		}
+		return new AutoPersistentDataType<T>((Class<T>)type.getClass());
 	}
 }

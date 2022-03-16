@@ -1,4 +1,4 @@
-package org.github.lorisdemicheli.inventory.util;
+package com.github.lorisdemicheli.inventory.util;
 
 public abstract class Ask {
 

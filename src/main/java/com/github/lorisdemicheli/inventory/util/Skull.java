@@ -1,4 +1,4 @@
-package org.github.lorisdemicheli.inventory.util;
+package com.github.lorisdemicheli.inventory.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,8 +11,8 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.SkullType;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -54,6 +54,7 @@ public class Skull {
 		SkullMeta sm = (SkullMeta) is.getItemMeta();
 		GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
 		gameProfile.getProperties().put("textures", new Property("textures", value, signature));
+		//TODO con reflectionutils
 		try {
 			Field profileField = sm.getClass().getDeclaredField("profile");
 			profileField.setAccessible(true);
@@ -82,7 +83,8 @@ public class Skull {
 		return Integer.parseInt(name.substring(0, name.length() - 4));
 	}
 
-	public static ItemStack getHead(Player player) {
+	//TODO CHECK OFFLINEPLAYER ALTRIMENTI PLAYER
+	public static ItemStack getHead(OfflinePlayer player) {
 		String signature;
 		String value;
 		try {

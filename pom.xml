@@ -4,15 +4,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.github.lorisdemicheli</groupId>
 	<artifactId>Inventory</artifactId>
-	<version>1.0</version>
-	<description>API create inventoy</description>
+	<version>2.1.2</version>
+	<description>API for create custom inventoy</description>
 	<properties>
-		<project.class.main>org.github.lorisdemicheli.inventory.examples.Main</project.class.main>
-		<project.dev.name>xLoris99</project.dev.name>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 	<repositories>
+		<repository>
+			<id>minecraft-repo</id>
+			<url>https://libraries.minecraft.net/</url>
+		</repository>
 		<repository>
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -20,42 +22,19 @@
 	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.16.4-R0.1-SNAPSHOT</version>
-			<type>jar</type>
+			<groupId>com.mojang</groupId>
+			<artifactId>authlib</artifactId>
+			<version>1.5.21</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>craftbukkit</artifactId>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
 			<version>1.16.4-R0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/craftbukkit-1.16.4.jar</systemPath>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
-	<defaultGoal>clean compile assembly:single</defaultGoal>
-		<sourceDirectory>src/</sourceDirectory>
-		<resources>
-			 <resource>
-				<directory>src/test/java</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/plugin.yml</include>
-				</includes>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-			<resource>
-				<directory>src/main/java</directory>
-				<filtering>true</filtering>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -64,7 +43,6 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 				<executions>
 					<execution>
