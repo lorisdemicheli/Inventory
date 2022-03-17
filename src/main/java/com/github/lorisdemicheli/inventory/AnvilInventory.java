@@ -36,13 +36,12 @@ public abstract class AnvilInventory implements BaseInventory{
 	}
 	
 	private Object playerHandle(HumanEntity human) {
-		Class<?> craftPlayer = ReflectionUtils.getCBVClass("entity.CraftPlayer");
+		Class<?> craftPlayer = ReflectionUtils.getCraftBukkitVersionClass("entity.CraftPlayer");
 		return ReflectionUtils.callMethod(craftPlayer.cast(human), "getHandle");
 	}
 	
 	private Object chatMessageTitle() {
-		return ReflectionUtils.newInstanceWithConstructor(
-				ReflectionUtils.constractorValue(ReflectionUtils.getMVClass("ChatMessage"), String.class), title());
+		return ReflectionUtils.newInstance(ReflectionUtils.getServerVersionClass("ChatMessage"), title());
 	}
 
 	@Override
@@ -50,30 +49,29 @@ public abstract class AnvilInventory implements BaseInventory{
 		Player player = (Player) human;
 		Object playerHandle = playerHandle(human);
 		//default
-		Class<?> craftEventFactoryClass = ReflectionUtils.getCBVClass("event.CraftEventFactory");
+		Class<?> craftEventFactoryClass = ReflectionUtils.getCraftBukkitVersionClass("event.CraftEventFactory");
 		ReflectionUtils.callStaticMethod(craftEventFactoryClass, "handleInventoryCloseEvent", playerHandle);
 		ReflectionUtils.setFieldValue(playerHandle, "activeContainer", 
-				ReflectionUtils.fieldValue(playerHandle, "defaultContainer"));
+				ReflectionUtils.getFieldValue(playerHandle, "defaultContainer"));
 		
 		//container
 		int nextContainerCounter = (int) ReflectionUtils.callMethod(playerHandle, "nextContainerCounter");
-		Object playerInventory = ReflectionUtils.fieldValue(playerHandle, "inventory");
-		Class<?> containerAccessClass = ReflectionUtils.getMVClass("ContainerAccess");
-		Class<?> craftWorldClass = ReflectionUtils.getCBVClass("CraftWorld");
+		Object playerInventory = ReflectionUtils.getFieldValue(playerHandle, "inventory");
+		Class<?> containerAccessClass = ReflectionUtils.getServerVersionClass("ContainerAccess");
+		Class<?> craftWorldClass = ReflectionUtils.getCraftBukkitVersionClass("CraftWorld");
 		Object craftWorld = craftWorldClass.cast(player.getWorld());
 		Object handleCraftWorld = ReflectionUtils.callMethod(craftWorld, "getHandle");
-		Class<?> blockPositionClass = ReflectionUtils.getMVClass("BlockPosition");
-		Object blockPosition = ReflectionUtils.newInstanceWithConstructor(ReflectionUtils.constractorValue(blockPositionClass,
-				int.class,int.class,int.class), 0,0,0);
+		Class<?> blockPositionClass = ReflectionUtils.getServerVersionClass("BlockPosition");
+		Object blockPosition = ReflectionUtils.newInstance(blockPositionClass, 0,0,0);
 		Object containerAccess = ReflectionUtils.callStaticMethod(containerAccessClass,"at",handleCraftWorld,blockPosition);
-		Class<?> anvilClass = ReflectionUtils.getMVClass("ContainerAnvil");
+		Class<?> anvilClass = ReflectionUtils.getServerVersionClass("ContainerAnvil");
 		Object anvil = ReflectionUtils.newInstance(anvilClass, nextContainerCounter,playerInventory,containerAccess);
 		ReflectionUtils.setFieldValue(anvil, "checkReachable", false);
-		Object levelCost = ReflectionUtils.fieldValue(anvil, "levelCost");
-		ReflectionUtils.callMethod(levelCost, ReflectionUtils.findMethod(levelCost.getClass(), "set", int.class), 0);
+		Object levelCost = ReflectionUtils.getFieldValue(anvil, "levelCost");
+		ReflectionUtils.callMethod(levelCost, "set", 0);
 		
 		//set holder
-		Object inventorySubcontainer = ReflectionUtils.fieldValue(anvil, "repairInventory");
+		Object inventorySubcontainer = ReflectionUtils.getFieldValue(anvil, "repairInventory");
 		ReflectionUtils.setFieldValue(inventorySubcontainer, "bukkitOwner", this);
 		
 		//inv
@@ -82,15 +80,13 @@ public abstract class AnvilInventory implements BaseInventory{
 		placeItem(human);
 		
 		//open/send
-		Class<?> containersClass = ReflectionUtils.getMVClass("Containers");
-		Object containerAnvil = ReflectionUtils.staticFieldValue(containersClass,"ANVIL");
-		int anvilId = (int) ReflectionUtils.fieldValue(anvil, "windowId");
-		Class<?> iChatBaseComponentClass = ReflectionUtils.getMVClass("IChatBaseComponent");
-		Class<?> packetPlayOutOpenWindowClass = ReflectionUtils.getMVClass("PacketPlayOutOpenWindow");
-		Object packetPlayOutOpenWindow = ReflectionUtils.newInstanceWithConstructor(ReflectionUtils.constractorValue(
-				packetPlayOutOpenWindowClass, int.class,containersClass,iChatBaseComponentClass),
-				anvilId,containerAnvil,chatMessageTitle());
-		Object playerConnection = ReflectionUtils.fieldValue(playerHandle, "playerConnection");
+		Class<?> containersClass = ReflectionUtils.getServerVersionClass("Containers");
+		Object containerAnvil = ReflectionUtils.getStaticFieldValue(containersClass,"ANVIL");
+		int anvilId = (int) ReflectionUtils.getFieldValue(anvil, "windowId");
+		Class<?> packetPlayOutOpenWindowClass = ReflectionUtils.getServerVersionClass("PacketPlayOutOpenWindow");
+		Object packetPlayOutOpenWindow = ReflectionUtils
+				.newInstance(packetPlayOutOpenWindowClass, anvilId,containerAnvil,chatMessageTitle());
+		Object playerConnection = ReflectionUtils.getFieldValue(playerHandle, "playerConnection");
 		ReflectionUtils.callMethod(playerConnection, "sendPacket", packetPlayOutOpenWindow);
 		ReflectionUtils.setFieldValue(playerHandle, "activeContainer", anvil);
 		ReflectionUtils.callMethod(anvil, "addSlotListener", playerHandle);
@@ -113,12 +109,12 @@ public abstract class AnvilInventory implements BaseInventory{
 
 	@Override
 	public BaseInventory getSub() {
-		throw new RuntimeException("Sub inventory not supported");
+		throw new UnsupportedOperationException("Sub inventory not supported");
 	}
 
 	@Override
 	public void setSub(BaseInventory sub) {
-		throw new RuntimeException("Sub inventory not supported");
+		throw new UnsupportedOperationException("Sub inventory not supported");
 	}
 
 	@Override

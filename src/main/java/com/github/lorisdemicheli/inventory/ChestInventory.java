@@ -1,7 +1,6 @@
 package com.github.lorisdemicheli.inventory;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,7 +11,6 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +22,6 @@ import com.github.lorisdemicheli.inventory.listener.InventoryListener;
 import com.github.lorisdemicheli.inventory.util.Ask;
 import com.github.lorisdemicheli.inventory.util.BaseInventory;
 import com.github.lorisdemicheli.inventory.util.DataType;
-import com.github.lorisdemicheli.inventory.util.ReflectionUtils;
 import com.github.lorisdemicheli.inventory.util.StringSearch;
 
 public abstract class ChestInventory<T extends Serializable> implements InventoryHolder,BaseInventory {
@@ -198,30 +195,6 @@ public abstract class ChestInventory<T extends Serializable> implements Inventor
 		if (autoUpdate()) {
 			Bukkit.getServer().getScheduler().cancelTask(updateInvId);
 		}
-	}
-
-	protected final void renameInventory(Player player, String title) {
-		final String NMS_VERSION = Bukkit.getServer().getClass().getPackage().getName().substring(23);
-
-		Object craftPlayer = ReflectionUtils
-				.classForName("org.bukkit.craftbukkit." + NMS_VERSION + ".entity.CraftPlayer").cast(player);
-		Object entityPlayer = ReflectionUtils.callMethod(craftPlayer, "getHandle");
-		int windowId = (int) ReflectionUtils.fieldValue(ReflectionUtils.fieldValue(entityPlayer, "activeContainer"),
-				"windowId");
-		Object inventoryType = ReflectionUtils.callStaticMethod(
-				ReflectionUtils.classForName("org.bukkit.craftbukkit." + NMS_VERSION + ".inventory.CraftContainer"),
-				"getNotchInventoryType", this.inventory);
-		Object chatComponentText = ReflectionUtils.newInstanceWithArgument(
-				ReflectionUtils.classForName("net.minecraft.server." + NMS_VERSION + ".ChatComponentText"), title);
-		Class<?> iChatBaseComponent = ReflectionUtils
-				.classForName("net.minecraft.server." + NMS_VERSION + ".IChatBaseComponent");
-		Constructor<?> packetConstructor = ReflectionUtils.constractorValue(
-				ReflectionUtils.classForName("net.minecraft.server." + NMS_VERSION + ".PacketPlayOutOpenWindow"),
-				int.class, inventoryType.getClass(), iChatBaseComponent);
-		Object packet = ReflectionUtils.newInstanceWithConstructor(packetConstructor, windowId, inventoryType,
-				chatComponentText);
-		Object playerConnection = ReflectionUtils.fieldValue(entityPlayer, "playerConnection");
-		ReflectionUtils.callMethod(playerConnection, "sendPacket", packet);
 	}
 
 	@Override

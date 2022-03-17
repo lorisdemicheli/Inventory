@@ -5,237 +5,234 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 
 public class ReflectionUtils {
-
-	public static final String NMS_VERSION = Bukkit.getServer().getClass().getPackage().getName().substring(23);
-
-	/**
-	 * Get class for current version
+	
+	
+	/*
 	 * 
-	 * @param className
-	 * @return Class for current version
-	 */
-	public static Class<?> getMVClass(String className) {
-		try {
-			return Class.forName("net.minecraft.server." + NMS_VERSION + "." + className);
-		} catch (ClassNotFoundException e) {
-			return null;
-		}
-	}
-
-	/**
-	 * Get class for current version of craftbukkit
+	 * GENERAL
 	 * 
-	 * @param className
-	 * @return Class for current version
+	 * 
 	 */
-	public static Class<?> getCBVClass(String className) {
-		try {
-			return Class.forName("org.bukkit.craftbukkit." + NMS_VERSION + "." + className);
-		} catch (ClassNotFoundException e) {
-			return null;
-		}
+	private static final Map<Class<?>, Class<?>> WRAPPER_TYPE_MAP;
+	static {
+		WRAPPER_TYPE_MAP = new HashMap<Class<?>, Class<?>>(9);
+	    WRAPPER_TYPE_MAP.put(Integer.class, int.class);
+	    WRAPPER_TYPE_MAP.put(Byte.class, byte.class);
+	    WRAPPER_TYPE_MAP.put(Character.class, char.class);
+	    WRAPPER_TYPE_MAP.put(Boolean.class, boolean.class);
+	    WRAPPER_TYPE_MAP.put(Double.class, double.class);
+	    WRAPPER_TYPE_MAP.put(Float.class, float.class);
+	    WRAPPER_TYPE_MAP.put(Long.class, long.class);
+	    WRAPPER_TYPE_MAP.put(Short.class, short.class);
+	    WRAPPER_TYPE_MAP.put(Void.class, void.class);
 	}
-
-	public static Class<?> classForName(String className) {
-		try {
-			return Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
+	
+	private static boolean equalsParameter(Parameter[] parameter, Class<?>[] inputParameter) {
+		if(parameter.length != inputParameter.length) {
+			return false;
 		}
-	}
-
-	private static boolean parameterClass(Parameter[] parameter, Object... parameters) {
-		for (int i = 0; i < parameters.length; i++) {
-			if (parameter.length != parameters.length) {
-				return false;
+		for(int i = 0; i < parameter.length; i++) {
+			Parameter par = parameter[i];
+			Class<?> classPar = inputParameter[i];
+			if(par.getType().isPrimitive()) {
+				classPar = WRAPPER_TYPE_MAP.get(classPar);
 			}
-			if (!parameter[i].getType().isInstance(parameters[i])) {
-				if (parameter[i].getType().isPrimitive()) {
-					if (!isValidPrimitive(parameter[i], parameters[i])) {
-						return false;
-					}
-				} else {
-					return false;
-				}
+			if(!par.getType().isAssignableFrom(classPar)) {
+				return false;
 			}
 		}
 		return true;
 	}
-
-	public static <T> T newInstanceWithConstructor(Constructor<T> constructor, Object... parameters) {
-		try {
-			return constructor.newInstance(parameters);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static boolean isValidPrimitive(Parameter p, Object o) {
-		if ((p.getType().equals(boolean.class) && o.getClass().equals(Boolean.class))
-				|| (p.getType().equals(byte.class) && o.getClass().equals(Byte.class))
-				|| (p.getType().equals(char.class) && o.getClass().equals(Character.class))
-				|| (p.getType().equals(short.class) && o.getClass().equals(Short.class))
-				|| (p.getType().equals(long.class) && o.getClass().equals(Long.class))
-				|| (p.getType().equals(float.class) && o.getClass().equals(Float.class))
-				|| (p.getType().equals(double.class) && o.getClass().equals(Double.class))
-				|| (p.getType().equals(int.class) && o.getClass().equals(Integer.class))) {
-			return true;
-		}
-		return false;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> T newInstance(Class<T> clazz, Object... parameters) {
-		try {
-			List<Constructor<?>> constactor = Arrays.asList(clazz.getConstructors());
-			for (Constructor<?> c : constactor) {
-				if (parameterClass(c.getParameters(), parameters)) {
-					return (T) c.newInstance(parameters);
-				}
-			}
-			return null;
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static <T> Constructor<T> constractorValue(Class<T> clazz, Class<?>... parameterTypes) {
-		try {
-			return clazz.getConstructor(parameterTypes);
-		} catch (NoSuchMethodException | SecurityException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static <T> T newInstanceWithArgument(Class<T> clazz, Object... argument) {
-		List<Class<?>> parameterTypes = Arrays.asList(argument).stream().map(a -> a.getClass())
+	
+	private static Class<?>[] convertToClass(Object...objects){
+		List<Class<?>> parametersClass = Arrays.asList(objects)
+				.stream()
+				.map(p -> p.getClass())
 				.collect(Collectors.toList());
-		try {
-			return constractorValue(clazz, parameterTypes.toArray(new Class<?>[parameterTypes.size()]))
-					.newInstance(argument);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static Object callMethod(Object obj, String methodName, Object... parameters) {
-		try {
-			List<Method> methods = Arrays.asList(obj.getClass().getMethods()).stream()
-					.filter(m -> m.getName().endsWith(methodName)).collect(Collectors.toList());
-			for (Method m : methods) {
-				if (parameterClass(m.getParameters(), parameters)) {
-					return m.invoke(obj, parameters);
-				}
-			}
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
-		return null;
-	}
-
-	public static Object callStaticMethod(Class<?> clazz, String methodName, Object... parameters) {
-		try {
-			List<Method> methods = Arrays.asList(clazz.getMethods()).stream()
-					.filter(m -> m.getName().endsWith(methodName)).collect(Collectors.toList());
-			for (Method m : methods) {
-				if (parameterClass(m.getParameters(), parameters)) {
-					return m.invoke(null, parameters);
-				}
-			}
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
-		return null;
-	}
-
-	public static Object callStaticMethod(Method method, Object... parameter) {
-		try {
-			return method.invoke(null, parameter);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static Method findStaticMethod(Class<?> clazz, String name, Class<?>... type) {
-		try {
-			return clazz.getMethod(name, type);
-		} catch (NoSuchMethodException | SecurityException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static Object callMethod(Object instance, Method method, Object... parameter) {
-		try {
-			method.setAccessible(true);
-			return method.invoke(instance, parameter);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static Method findMethod(Class<?> clazz, String name, Class<?>... type) {
-		try {
-			return clazz.getDeclaredMethod(name, type);
-		} catch (NoSuchMethodException | SecurityException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static Object fieldValue(Object obj, String fieldName) {
-		try {
-			Field f = findField(obj.getClass(),fieldName);
-			f.setAccessible(true);
-			return f.get(obj);
-		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new RuntimeException(e);
-		}
+		return parametersClass.toArray(new Class[parametersClass.size()]);
 	}
 	
-	public static Object staticFieldValue(Class<?> clazz,String fieldName) {
+	/*
+	 * 
+	 * FIELD 
+	 * 
+	 */
+	private static Field findField(Class<?> clazz, String fieldName) {
+		Field field;
 		try {
-			Field f = findField(clazz, fieldName);
-			f.setAccessible(true);
-			return f.get(null);
-		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static void setFieldValue(Object obj, String fieldName, Object value) {
-		try {
-			Field f = findField(obj.getClass(),fieldName);
-			f.setAccessible(true);
-			f.set(obj, value);
-		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static Field findField(Class<?> clazz, String fieldName) {
-		Field f;
-		try {
-			f = clazz.getField(fieldName);
+			field = clazz.getField(fieldName);
 		} catch (NoSuchFieldException e) {
 			try {
-				f = clazz.getDeclaredField(fieldName);
+				field = clazz.getDeclaredField(fieldName);
 			} catch (NoSuchFieldException e1) {
 				if(!clazz.getSuperclass().equals(Object.class)) {
-					f = findField(clazz.getSuperclass(), fieldName);
+					field = findField(clazz.getSuperclass(), fieldName);
 				} else {
 					throw new RuntimeException(e1);
 				}
 			}
 		}
-		return f;
+		return field;
+	}
+	
+	public static Object getFieldValue(Object obj, String fieldName) {
+		try {
+			Field field = findField(obj.getClass(),fieldName);
+			if(!field.isAccessible()) {
+				field.setAccessible(true);
+			}
+			return field.get(obj);
+		} catch (IllegalAccessException | IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static void setFieldValue(Object obj, String fieldName, Object value) {
+		try {
+			Field field = findField(obj.getClass(),fieldName);
+			if(!field.isAccessible()) {
+				field.setAccessible(true);
+			}
+			field.set(obj, value);
+		} catch (IllegalAccessException | IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static Object getStaticFieldValue(Class<?> clazz,String fieldName) {
+		try {
+			Field field = findField(clazz, fieldName);
+			if(!field.isAccessible()) {
+				field.setAccessible(true);
+			}
+			return field.get(null);
+		} catch (IllegalAccessException | IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static void setStaticFieldValue(Class<?> clazz,String fieldName,Object value) {
+		try {
+			Field field = findField(clazz, fieldName);
+			if(!field.isAccessible()) {
+				field.setAccessible(true);
+			}
+			field.set(null, value);
+		} catch (IllegalAccessException | IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/*
+	 * 
+	 * METHOD
+	 * 
+	 */	
+	private static List<Method> getAllMethod(Class<?> clazz,List<Method> methods){
+		if(methods == null) {
+			methods = new ArrayList<>();
+		}
+		methods.addAll(Arrays.asList(clazz.getMethods()));
+		methods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
+		if(!clazz.isInterface() && !clazz.getSuperclass().equals(Object.class)) {
+			methods.addAll(getAllMethod(clazz.getSuperclass(),methods));
+		} 
+		return methods;
+	}
+	
+	private static Method getMethodParameters(Class<?> clazz,String methodName,Object...parameters) {
+		List<Method> methods = getAllMethod(clazz,null);
+		methods = methods.stream()
+				.filter(m->m.getName().equals(methodName))
+				.collect(Collectors.toList());
+		for(Method method : methods) {
+			if(equalsParameter(method.getParameters(),convertToClass(parameters))) {
+				return method;
+			}
+		}
+		throw new RuntimeException("No such method");
+	}
+	
+	public static Object callMethod(Object instance,String methodName,Object...parameters) {
+		Method method = getMethodParameters(instance.getClass(),methodName,parameters);
+		if(!method.isAccessible()) {
+			method.setAccessible(true);
+		}
+		try {
+			return method.invoke(instance, parameters);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}	
+	}
+	
+	public static Object callStaticMethod(Class<?> clazz,String methodName,Object...parameters) {
+		Method method = getMethodParameters(clazz,methodName,parameters);
+		if(!method.isAccessible()) {
+			method.setAccessible(true);
+		}
+		try {
+			return method.invoke(null, parameters);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}	
+	}
+	
+	/*
+	 * 
+	 * CONSTRACTOR
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	private static <T> Constructor<T> getConstructor(Class<T> clazz,Object...parameters){
+		for (Constructor<?> constructor : clazz.getConstructors()) {
+			if(equalsParameter(constructor.getParameters(), convertToClass(parameters))) {
+				return (Constructor<T>) constructor;
+			}
+		}
+		throw new RuntimeException("No such constructor");
+	}
+	
+	
+	public static <T> T newInstance(Class<T> clazz,Object...parameters) {
+		Constructor<T> constructor = getConstructor(clazz, parameters);
+		try {
+			return constructor.newInstance(parameters);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException	| InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/*
+	 * 
+	 * MINECRAFT
+	 * 
+	 */
+	
+	public static final String NMS_VERSION = Bukkit.getServer().getClass().getPackage().getName().substring(23);
+	
+	public static Class<?> getServerVersionClass(String className) {
+		try {
+			return Class.forName("net.minecraft.server." + NMS_VERSION + "." + className);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static Class<?> getCraftBukkitVersionClass(String className) {
+		try {
+			return Class.forName("org.bukkit.craftbukkit." + NMS_VERSION + "." + className);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
