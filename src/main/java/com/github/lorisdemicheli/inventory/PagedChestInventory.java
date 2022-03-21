@@ -31,7 +31,7 @@ public abstract class PagedChestInventory<E extends Serializable> extends ChestI
 
 	protected abstract ItemStack itemList(HumanEntity human,E element);
 
-	protected abstract void onItemSelectedList(E element, InventoryClickEvent event);
+	protected abstract void onItemListSelected(E element, InventoryClickEvent event);
 	
 	@Override
 	public void placeItem(HumanEntity human) {}
@@ -50,7 +50,7 @@ public abstract class PagedChestInventory<E extends Serializable> extends ChestI
 		}
 		E val = getItemValue(item);
 		if (val != null) {
-			onItemSelectedList(val, event);
+			onItemListSelected(val, event);
 		}
 	}
 

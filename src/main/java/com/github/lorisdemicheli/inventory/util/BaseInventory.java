@@ -9,7 +9,7 @@ import org.bukkit.plugin.Plugin;
 public interface BaseInventory extends InventoryHolder{
 
 	void placeItem(HumanEntity human);
-	String title();
+	String title(HumanEntity human);
 	void onItemSelected(InventoryClickEvent event, ItemStack item);
 	void setItem(int index, ItemStack item);
 	void open(HumanEntity human);

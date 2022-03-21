@@ -4,12 +4,11 @@ import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
 import com.github.lorisdemicheli.inventory.util.BaseInventory;
+import com.github.lorisdemicheli.inventory.util.ItemUtil;
 import com.github.lorisdemicheli.inventory.util.StringSearch;
 
-public class SearchInventory extends AnvilInventory{
+public class SearchInventory extends AnvilInventory {
 	
 	private StringSearch search;
 
@@ -20,21 +19,17 @@ public class SearchInventory extends AnvilInventory{
 
 	@Override
 	public void placeItem(HumanEntity human) {
-		ItemStack item = new ItemStack(Material.PAPER);
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(search.getTitle());
-		item.setItemMeta(meta);
-		setItem(0, item);
+		setItem(0, ItemUtil.basicItem(Material.PAPER, search.getTitle(), 1));
 	}
 
 	@Override
-	public String title() {
+	public String title(HumanEntity human) {
 		return search.getTitle();
 	}
 
 	@Override
 	public void onItemSelected(InventoryClickEvent event, ItemStack item) {
-		if(event.getRawSlot() == 2 && !item.getType().equals(Material.AIR)) {
+		if(event.getRawSlot() == 2) {
 			search.onResult(item.getItemMeta().getDisplayName());
 		}
 	}	

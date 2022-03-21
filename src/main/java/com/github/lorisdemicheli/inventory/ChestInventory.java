@@ -173,7 +173,7 @@ public abstract class ChestInventory<T extends Serializable> implements Inventor
 
 	public void open(HumanEntity human) {
 		if (inventory == null) {
-			inventory = Bukkit.createInventory(this, inventorySize, title());
+			inventory = Bukkit.createInventory(this, inventorySize, title(human));
 		}
 		if (previous != null) {
 			previous.close(human);

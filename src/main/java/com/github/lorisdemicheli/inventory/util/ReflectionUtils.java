@@ -47,7 +47,7 @@ public class ReflectionUtils {
 			if(par.getType().isPrimitive()) {
 				classPar = WRAPPER_TYPE_MAP.get(classPar);
 			}
-			if(!par.getType().isAssignableFrom(classPar)) {
+			if(classPar == null || !par.getType().isAssignableFrom(classPar)) {
 				return false;
 			}
 		}
@@ -133,6 +133,21 @@ public class ReflectionUtils {
 		}
 	}
 	
+ 	public static List<Field> getAllField(Class<?> clazz) {
+ 		List<Field> fields = new ArrayList<>();
+ 		fields.addAll(Arrays.asList(clazz.getFields()));
+ 		fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+ 		return fields;
+ 	}
+ 	
+ 	public static Object fieldValue(Field field,Object instance) {
+ 		try {
+			return field.get(instance);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+ 	}
+	
 	/*
 	 * 
 	 * METHOD
@@ -189,7 +204,7 @@ public class ReflectionUtils {
 	
 	/*
 	 * 
-	 * CONSTRACTOR
+	 * CONSTRUCTOR
 	 * 
 	 */
 	@SuppressWarnings("unchecked")

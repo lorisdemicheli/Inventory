@@ -2,7 +2,6 @@ package com.github.lorisdemicheli.inventory.util;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.persistence.PersistentDataType.PrimitivePersistentDataType;
 
@@ -25,14 +24,10 @@ public class DataType {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends Serializable> PersistentDataType<?, T> getType(T type) {
-		for (Field f : DataType.class.getFields()) {
-			if (Modifier.isPublic(f.getModifiers())) {
-				try {
-					PersistentDataType<?, ?> typeint = (PersistentDataType<?, ?>) f.get(null);
-					if (typeint.getComplexType().getTypeName().equals(type.getClass().getCanonicalName())) {
-						return (PersistentDataType<?, T>) typeint;
-					}
-				} catch (IllegalArgumentException | IllegalAccessException e) {	}
+		for(Field field : ReflectionUtils.getAllField(DataType.class)) {
+			PersistentDataType<?, ?> baseType = (PersistentDataType<?, ?>) ReflectionUtils.fieldValue(field,null);
+			if (baseType.getComplexType().equals(type.getClass())) {
+				return (PersistentDataType<?, T>) baseType;
 			}
 		}
 		return new AutoPersistentDataType<T>((Class<T>)type.getClass());

@@ -3,7 +3,6 @@ package com.github.lorisdemicheli.inventory.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -25,7 +24,7 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-@SuppressWarnings("deprecation")
+
 public class Skull {
 
 	private static CacheLoader<String, String> loader;
@@ -54,18 +53,12 @@ public class Skull {
 		SkullMeta sm = (SkullMeta) is.getItemMeta();
 		GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
 		gameProfile.getProperties().put("textures", new Property("textures", value, signature));
-		//TODO con reflectionutils
-		try {
-			Field profileField = sm.getClass().getDeclaredField("profile");
-			profileField.setAccessible(true);
-			profileField.set(sm, gameProfile);
-		} catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e1) {
-			e1.printStackTrace();
-		}
+		ReflectionUtils.setFieldValue(sm, "profile", gameProfile);
 		is.setItemMeta((ItemMeta) sm);
 		return is;
 	}
 
+	@SuppressWarnings("deprecation")
 	private static ItemStack getSkull() {
 		ItemStack skull;
 		if (getVersion() > 12) {

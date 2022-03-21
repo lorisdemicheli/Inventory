@@ -1,5 +1,6 @@
 package com.github.lorisdemicheli.inventory.listener;
 
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -41,7 +42,7 @@ public class InventoryListener implements Listener {
 			BaseInventory base = (BaseInventory) holder;
 			ItemStack item = event.getCurrentItem();
 			
-			if (item != null) {			
+			if (item != null && !item.getType().equals(Material.AIR)) {			
 				base.onItemSelected(event, item);
 				event.setCancelled(base.cancelledClick());
 			}

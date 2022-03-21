@@ -40,8 +40,8 @@ public abstract class AnvilInventory implements BaseInventory{
 		return ReflectionUtils.callMethod(craftPlayer.cast(human), "getHandle");
 	}
 	
-	private Object chatMessageTitle() {
-		return ReflectionUtils.newInstance(ReflectionUtils.getServerVersionClass("ChatMessage"), title());
+	private Object chatMessageTitle(HumanEntity human) {
+		return ReflectionUtils.newInstance(ReflectionUtils.getServerVersionClass("ChatMessage"), title(human));
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public abstract class AnvilInventory implements BaseInventory{
 		ReflectionUtils.setFieldValue(inventorySubcontainer, "bukkitOwner", this);
 		
 		//inv
-		ReflectionUtils.callMethod(anvil, "setTitle", chatMessageTitle());
+		ReflectionUtils.callMethod(anvil, "setTitle", chatMessageTitle(human));
 		this.inv = (Inventory) ReflectionUtils.callMethod(ReflectionUtils.callMethod(anvil, "getBukkitView"), "getTopInventory");
 		placeItem(human);
 		
@@ -85,7 +85,7 @@ public abstract class AnvilInventory implements BaseInventory{
 		int anvilId = (int) ReflectionUtils.getFieldValue(anvil, "windowId");
 		Class<?> packetPlayOutOpenWindowClass = ReflectionUtils.getServerVersionClass("PacketPlayOutOpenWindow");
 		Object packetPlayOutOpenWindow = ReflectionUtils
-				.newInstance(packetPlayOutOpenWindowClass, anvilId,containerAnvil,chatMessageTitle());
+				.newInstance(packetPlayOutOpenWindowClass, anvilId,containerAnvil,chatMessageTitle(human));
 		Object playerConnection = ReflectionUtils.getFieldValue(playerHandle, "playerConnection");
 		ReflectionUtils.callMethod(playerConnection, "sendPacket", packetPlayOutOpenWindow);
 		ReflectionUtils.setFieldValue(playerHandle, "activeContainer", anvil);

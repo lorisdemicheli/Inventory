@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -39,7 +36,7 @@ public class AutoPersistentDataType<T> implements PersistentDataType<byte[], T>{
 			out.writeObject(complex);
 			out.close();
 		} catch (IOException e) {
-			Bukkit.getServer().getLogger().log(Level.SEVERE, "Unable to transform to primitive",e);
+			throw new RuntimeException("Unable to transform to primitive",e);
 		}
 		return bos.toByteArray();
 	}
@@ -53,8 +50,7 @@ public class AutoPersistentDataType<T> implements PersistentDataType<byte[], T>{
 			in = new ObjectInputStream(bis);
 			return (T) in.readObject();
 		} catch (IOException | ClassNotFoundException e) {
-			Bukkit.getServer().getLogger().log(Level.SEVERE, "Unable to transform from primitive",e);
+			throw new RuntimeException("Unable to transform from primitive",e);
 		}
-		return null;
 	}
 }

@@ -31,7 +31,7 @@ public class AskInventory extends ChestInventory<Boolean> {
 	}
 
 	@Override
-	public String title() {
+	public String title(HumanEntity human) {
 		return ask.getQuestion();
 	}
 
@@ -64,7 +64,7 @@ public class AskInventory extends ChestInventory<Boolean> {
 		if(yes == null) {
 			ItemStack item = new ItemStack(Material.EMERALD_BLOCK);
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName("YES");
+			meta.setDisplayName(ask.getYes());
 			item.setItemMeta(meta);
 			yes = item;
 		}
@@ -75,7 +75,7 @@ public class AskInventory extends ChestInventory<Boolean> {
 		if(no == null) {
 			ItemStack item = new ItemStack(Material.REDSTONE_BLOCK);
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName("NO");
+			meta.setDisplayName(ask.getNo());
 			item.setItemMeta(meta);
 			no = item;
 		}
@@ -84,9 +84,18 @@ public class AskInventory extends ChestInventory<Boolean> {
 	
 	protected ItemStack getItemQuestion() {
 		if(question == null) {
-			question = CustomHead.questionMark(ask.getQuestion());;
+			question = CustomHead.questionMark(ask.getQuestion());
 		}
 		return question;
 	}
 
+	@Override
+	public BaseInventory getSub() {
+		throw new UnsupportedOperationException("Sub inventory not supported");
+	}
+
+	@Override
+	public void setSub(BaseInventory sub) {
+		throw new UnsupportedOperationException("Sub inventory not supported");
+	}
 }
