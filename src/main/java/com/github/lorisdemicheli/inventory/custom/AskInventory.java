@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory;
+package com.github.lorisdemicheli.inventory.custom;
 
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -6,6 +6,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.github.lorisdemicheli.inventory.ChestInventory;
 import com.github.lorisdemicheli.inventory.util.Ask;
 import com.github.lorisdemicheli.inventory.util.BaseInventory;
 import com.github.lorisdemicheli.inventory.util.CustomHead;

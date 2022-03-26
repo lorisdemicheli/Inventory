@@ -18,6 +18,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
+import com.github.lorisdemicheli.inventory.custom.AskInventory;
+import com.github.lorisdemicheli.inventory.custom.SearchInventory;
 import com.github.lorisdemicheli.inventory.listener.InventoryListener;
 import com.github.lorisdemicheli.inventory.util.Ask;
 import com.github.lorisdemicheli.inventory.util.BaseInventory;
@@ -47,6 +49,9 @@ public abstract class ChestInventory<T extends Serializable> implements Inventor
 
 	public ChestInventory(Plugin plugin, int size) {
 		this(plugin);
+		if(size % 9 != 0 || size > 54 || size < 9) {
+			throw new IllegalArgumentException("Size " + size + " is not allowed");
+		}
 		this.inventorySize = size;
 	}
 

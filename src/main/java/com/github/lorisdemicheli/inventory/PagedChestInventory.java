@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +17,9 @@ public abstract class PagedChestInventory<E extends Serializable> extends ChestI
 	
 	private List<E> elements;
 	private int page = 0;
+	
+	private String nextPageText = "NEXT";
+	private String previousPageText = "PREVIOUS";
 
 	public PagedChestInventory(BaseInventory previous, int size) {
 		super(previous, size);
@@ -86,7 +88,6 @@ public abstract class PagedChestInventory<E extends Serializable> extends ChestI
 		while (value.hasNext()) {
 			Entry<Integer, ItemStack> itempos = value.next();
 			if(itempos.getKey() < (size-10) || itempos.getKey() == (size-9) || itempos.getKey() == (size-1)) {
-				Bukkit.getServer().getLogger().warning("POS  " + itempos.getKey() + " " + itempos.getValue());
 				return true;
 			}
 		}
@@ -94,14 +95,30 @@ public abstract class PagedChestInventory<E extends Serializable> extends ChestI
 	}
 
 	protected ItemStack getArrowRight() {
-		return CustomHead.arrowRight("NEXT");
+		return CustomHead.arrowRight(nextPageText);
 	}
 
 	protected ItemStack getArrowLeft() {
-		return CustomHead.arrowLeft("BACK");
+		return CustomHead.arrowLeft(previousPageText);
 	}
 
 	public List<E> getElements() {
 		return elements;
+	}
+
+	public String getPreviousPageText() {
+		return previousPageText;
+	}
+
+	public void setPreviousPageText(String previousPageText) {
+		this.previousPageText = previousPageText;
+	}
+
+	public String getNextPageText() {
+		return nextPageText;
+	}
+
+	public void setNextPageText(String nextPageText) {
+		this.nextPageText = nextPageText;
 	}
 }

@@ -14,13 +14,18 @@ public abstract class AnvilInventory implements BaseInventory{
 	
 	private Plugin plugin;
 	private BaseInventory previous;
+	private BaseInventory sub;
 	private Inventory inv;
+	
+	public AnvilInventory(Plugin plugin) {
+		InventoryListener.of(plugin);
+		this.plugin = plugin;
+	}
 
 	public AnvilInventory(BaseInventory previous) {
-		InventoryListener.of(plugin);
+		this(previous.getPlugin());
 		this.previous = previous;
 		this.previous.setSub(this);
-		this.plugin = previous.getPlugin();	
 	}
 
 	@Override
@@ -108,13 +113,13 @@ public abstract class AnvilInventory implements BaseInventory{
 	}
 
 	@Override
-	public BaseInventory getSub() {
-		throw new UnsupportedOperationException("Sub inventory not supported");
-	}
-
-	@Override
 	public void setSub(BaseInventory sub) {
-		throw new UnsupportedOperationException("Sub inventory not supported");
+		this.sub = sub;
+	}
+	
+	@Override
+	public BaseInventory getSub() {
+		return sub;
 	}
 
 	@Override
