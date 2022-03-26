@@ -18,7 +18,7 @@ To implement with Maven add the dependency on your pom
 <dependency>
   <groupId>com.github.lorisdemicheli</groupId>
   <artifactId>inventory</artifactId>
-  <version>2.1.4</version>
+  <version>2.1.5</version>
 </dependency>
 ```
 
