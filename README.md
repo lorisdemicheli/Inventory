@@ -1,16 +1,16 @@
 # Inventory
 
-**This is a simple method to create dynamic Minecraft Inventory GUI**
+**This is a simple method to create a dynamic Minecraft Inventory GUI**
 
-## What can do
+## What does it do
 
 - Dynamic inventory
 - Dynamic paged inventory
 - Anvil inventory
-- Custom PersistentDataType (just implement Serializable)
+- Custom PersistentDataType (just implements Serializable)
 - Inventory update without reopen
 
-## How implement
+## How to implement
 
 To implement with Maven add the dependency on your pom
 
@@ -24,9 +24,9 @@ To implement with Maven add the dependency on your pom
 
 ## How to use
 
-Crate a new Class, this class rappresent's the GUI, extends the type of inventory choice,
- for this example we use [ChestInventory](https://github.com/lorisdemicheli/Inventory/blob/main/src/main/java/com/github/lorisdemicheli/inventory/ChestInventory.java)
- and the Type of ivenctory we use String
+Create a new Class, this class rappresents the GUI, extends the type of inventory choice.
+For example we use [ChestInventory](https://github.com/lorisdemicheli/Inventory/blob/main/src/main/java/com/github/lorisdemicheli/inventory/ChestInventory.java)
+ and the type of inventory we will use String
  
  ```java
 public class TestNormal extends ChestInventory<String>{
@@ -82,7 +82,11 @@ public class TestNormal extends ChestInventory<String>{
 }
 ```
 
-In the second page of custom GUI with random number and an update every 5 second (100 tick), we set an item for go to previous inventory
+For the second example we use [PagedChestInventory](https://github.com/lorisdemicheli/Inventory/blob/main/src/main/java/com/github/lorisdemicheli/inventory/PagedChestInventory.java),
+in the example we have a list of random number which will update every 5 second (100 tick) and a BOWL item for go to previous inv (first example)
+
+
+In the second page of custom GUI, with random number and an update every 5 second (100 tick), we set an item for go to previous inventory
 
 ```java
 public class TestPaged extends PagedChestInventory<Integer>{
@@ -147,4 +151,4 @@ public class TestPaged extends PagedChestInventory<Integer>{
 
 - 1.16.X - @lorisdemicheli
 
-If you test with a different version write me if it works or have a bug for fix
+If you test with a different version contact me if it works or have a bug for fix
