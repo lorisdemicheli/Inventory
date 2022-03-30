@@ -1,10 +1,7 @@
 package com.github.lorisdemicheli.inventory;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -33,10 +30,7 @@ public abstract class PagedChestInventory<E extends Serializable> extends ChestI
 
 	protected abstract ItemStack itemList(HumanEntity human,E element);
 
-	protected abstract void onItemListSelected(E element, InventoryClickEvent event);
-	
-	@Override
-	public void placeItem(HumanEntity human) {}
+	protected abstract void onItemListSelected(InventoryClickEvent event,E element);
 
 	@Override
 	public void onItemSelected(InventoryClickEvent event, ItemStack item) {
@@ -50,19 +44,19 @@ public abstract class PagedChestInventory<E extends Serializable> extends ChestI
 				update(event.getWhoClicked());
 			}
 		}
-		E val = getItemValue(item);
-		if (val != null) {
-			onItemListSelected(val, event);
+		E element = getItemValue(item);
+		if (element != null) {
+			onItemListSelected(event, element);
 		}
 	}
 
 	@Override
-	protected void updateAsyncBeforeSync(HumanEntity human) {
+	public void beforePlaceItem(HumanEntity human) {
 		elements = listElements(human);
 		int realSize = getInventory().getSize();
 		int size = realSize - 9;
-		if(checkItem(realSize)) {
-			throw new IllegalArgumentException("Wrong position for one or more item");
+		if(!validPosition(realSize)) {
+			throw new IllegalArgumentException("Wrong position for one item");
 		}
 		if (elements != null) {
 			int skip = page * size;
@@ -81,17 +75,13 @@ public abstract class PagedChestInventory<E extends Serializable> extends ChestI
 		}
 	}
 	
-	private boolean checkItem(int size) {
-		if(size==9) return true;
+	private boolean validPosition(int size) {
+		if(size==9) return false;
 		
-		Iterator<Entry<Integer, ItemStack>> value = getItems().entrySet().iterator();
-		while (value.hasNext()) {
-			Entry<Integer, ItemStack> itempos = value.next();
-			if(itempos.getKey() < (size-10) || itempos.getKey() == (size-9) || itempos.getKey() == (size-1)) {
-				return true;
-			}
-		}
-		return false;
+		return !getItems().keySet()
+				.parallelStream()
+				.anyMatch(i->(i < (size-10) || i == (size-9) || i == (size-1)));
+		
 	}
 
 	protected ItemStack getArrowRight() {

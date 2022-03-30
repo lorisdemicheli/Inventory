@@ -18,7 +18,7 @@ To implement with Maven add the dependency on your pom
 <dependency>
   <groupId>com.github.lorisdemicheli</groupId>
   <artifactId>inventory</artifactId>
-  <version>2.1.5</version>
+  <version>2.2.0</version>
 </dependency>
 ```
 
@@ -85,9 +85,6 @@ public class TestNormal extends ChestInventory<String>{
 For the second example we use [PagedChestInventory](https://github.com/lorisdemicheli/Inventory/blob/main/src/main/java/com/github/lorisdemicheli/inventory/PagedChestInventory.java),
 in the example we have a list of random number which will update every 5 second (100 tick) and a BOWL item for go to previous inv (first example)
 
-
-In the second page of custom GUI, with random number and an update every 5 second (100 tick), we set an item for go to previous inventory
-
 ```java
 public class TestPaged extends PagedChestInventory<Integer>{
 
@@ -135,7 +132,7 @@ public class TestPaged extends PagedChestInventory<Integer>{
 	}
 
 	@Override
-	protected void onItemListSelected(Integer element, InventoryClickEvent event) {
+	protected void onItemListSelected(InventoryClickEvent event, Integer element) {
 		event.getWhoClicked().sendMessage("Selected number: " + element);
 	}
 

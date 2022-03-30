@@ -6,26 +6,19 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import com.github.lorisdemicheli.inventory.listener.InventoryListener;
 import com.github.lorisdemicheli.inventory.util.BaseInventory;
 import com.github.lorisdemicheli.inventory.util.ReflectionUtils;
 
-public abstract class AnvilInventory implements BaseInventory{
+public abstract class AnvilInventory extends AbstractBaseInventory {
 	
-	private Plugin plugin;
-	private BaseInventory previous;
-	private BaseInventory sub;
-	private Inventory inv;
+	private Object anvil;
 	
 	public AnvilInventory(Plugin plugin) {
-		InventoryListener.of(plugin);
-		this.plugin = plugin;
+		super(plugin);
 	}
 
 	public AnvilInventory(BaseInventory previous) {
-		this(previous.getPlugin());
-		this.previous = previous;
-		this.previous.setSub(this);
+		super(previous);
 	}
 
 	@Override
@@ -33,7 +26,7 @@ public abstract class AnvilInventory implements BaseInventory{
 		if(!validPosition(index)) {
 			throw new IllegalArgumentException(String.format("Position %d is not allowed", index));
 		}
-		getInventory().setItem(index, item);
+		super.setItem(index, item);
 	}
 	
 	private boolean validPosition(int index) {
@@ -48,9 +41,9 @@ public abstract class AnvilInventory implements BaseInventory{
 	private Object chatMessageTitle(HumanEntity human) {
 		return ReflectionUtils.newInstance(ReflectionUtils.getServerVersionClass("ChatMessage"), title(human));
 	}
-
+	
 	@Override
-	public void open(HumanEntity human) {
+	protected Inventory createInventory(HumanEntity human) {
 		Player player = (Player) human;
 		Object playerHandle = playerHandle(human);
 		//default
@@ -70,7 +63,7 @@ public abstract class AnvilInventory implements BaseInventory{
 		Object blockPosition = ReflectionUtils.newInstance(blockPositionClass, 0,0,0);
 		Object containerAccess = ReflectionUtils.callStaticMethod(containerAccessClass,"at",handleCraftWorld,blockPosition);
 		Class<?> anvilClass = ReflectionUtils.getServerVersionClass("ContainerAnvil");
-		Object anvil = ReflectionUtils.newInstance(anvilClass, nextContainerCounter,playerInventory,containerAccess);
+		anvil = ReflectionUtils.newInstance(anvilClass, nextContainerCounter,playerInventory,containerAccess);
 		ReflectionUtils.setFieldValue(anvil, "checkReachable", false);
 		Object levelCost = ReflectionUtils.getFieldValue(anvil, "levelCost");
 		ReflectionUtils.callMethod(levelCost, "set", 0);
@@ -81,10 +74,13 @@ public abstract class AnvilInventory implements BaseInventory{
 		
 		//inv
 		ReflectionUtils.callMethod(anvil, "setTitle", chatMessageTitle(human));
-		this.inv = (Inventory) ReflectionUtils.callMethod(ReflectionUtils.callMethod(anvil, "getBukkitView"), "getTopInventory");
-		placeItem(human);
-		
-		//open/send
+		return (Inventory) ReflectionUtils.callMethod(ReflectionUtils.callMethod(anvil, "getBukkitView"), "getTopInventory");
+	}
+
+	@Override
+	public void open(HumanEntity human) {
+		super.beforeOpen(human);
+		Object playerHandle = playerHandle(human);
 		Class<?> containersClass = ReflectionUtils.getServerVersionClass("Containers");
 		Object containerAnvil = ReflectionUtils.getStaticFieldValue(containersClass,"ANVIL");
 		int anvilId = (int) ReflectionUtils.getFieldValue(anvil, "windowId");
@@ -98,54 +94,18 @@ public abstract class AnvilInventory implements BaseInventory{
 	}
 
 	@Override
-	public void close(HumanEntity human) {
-		human.closeInventory();
-	}
-
-	@Override
 	public void onClose() {
 		getInventory().clear();
 	}
-	
+
 	@Override
-	public boolean cancelledClick() {
-		return true;
+	protected long periodTickUpdate() {
+		return 0;
 	}
 
 	@Override
-	public void setSub(BaseInventory sub) {
-		this.sub = sub;
-	}
-	
-	@Override
-	public BaseInventory getSub() {
-		return sub;
-	}
-
-	@Override
-	public BaseInventory getPrevious() {
-		return previous;
-	}
-
-	@Override
-	public void setPrevious(BaseInventory previous) {
-		this.previous = previous;
-	}
-
-	@Override
-	public Plugin getPlugin() {
-		return plugin;
-	}
-
-	@Override
-	public Inventory getInventory() {
-		return inv;
-	}
-
-	@Override
-	public void openPrevius(HumanEntity human) {
-		human.closeInventory();
-		previous.open(human);
+	protected boolean autoUpdate() {
+		return false;
 	}
 
 }
