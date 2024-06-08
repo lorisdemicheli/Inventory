@@ -34,11 +34,6 @@ jobs:
                     <username>${{ secrets.SONATYPE_USERNAME }}</username>
                     <password>${{ secrets.SONATYPE_PASSWORD }}</password>
                   </server>
-                  <server>
-                    <id>ossrh</id>
-                    <username>${{ secrets.SONATYPE_USERNAME }}</username>
-                    <password>${{ secrets.SONATYPE_PASSWORD }}</password>
-                  </server>
                 </servers>
               </settings>" > .maven/settings.xml
 
@@ -49,4 +44,4 @@ jobs:
       env:
         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-      run: mvn deploy -DskipTests --settings .maven/settings.xml
+      run: mvn deploy -Prelease -DskipTests --settings .maven/settings.xml
