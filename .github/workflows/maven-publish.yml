@@ -25,6 +25,16 @@ jobs:
         echo "<settings>
                 <servers>
                   <server>
+                    <id>sonatype-nexus-snapshots</id>
+                    <username>${{ secrets.SONATYPE_USERNAME }}</username>
+                    <password>${{ secrets.SONATYPE_PASSWORD }}</password>
+                  </server>
+                  <server>
+                    <id>sonatype-nexus-staging</id>
+                    <username>${{ secrets.SONATYPE_USERNAME }}</username>
+                    <password>${{ secrets.SONATYPE_PASSWORD }}</password>
+                  </server>
+                  <server>
                     <id>ossrh</id>
                     <username>${{ secrets.SONATYPE_USERNAME }}</username>
                     <password>${{ secrets.SONATYPE_PASSWORD }}</password>
