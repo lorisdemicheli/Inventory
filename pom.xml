@@ -9,11 +9,26 @@
 	<description>API for create custom inventoy</description>
 	<packaging>jar</packaging>
 
+	<developers>
+		<developer>
+			<name>Loris Demicheli</name>
+			<organizationUrl>https://github.com/lorisdemicheli</organizationUrl>
+		</developer>
+	</developers>
+
 	<properties>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.deploy.skip>true</maven.deploy.skip>
 	</properties>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<distributionManagement>
 		<repository>
@@ -26,12 +41,9 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<developers>
-		<developer>
-			<name>Loris Demicheli</name>
-			<organizationUrl>https://github.com/lorisdemicheli</organizationUrl>
-		</developer>
-	</developers>
+	<scm>
+		<url>https://svn.apache.org/viewvc/maven</url>
+	</scm>
 
 	<repositories>
 		<repository>
