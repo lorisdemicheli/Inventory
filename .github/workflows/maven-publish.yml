@@ -19,22 +19,6 @@ jobs:
         distribution: 'adopt'
         java-version: '8'
 
-    - name: Build with Maven
-      run: mvn clean install
-
-    - name: Deploy to Sonatype
-      env:
-        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-        SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-      run: mvn deploy -DskipTests --settings .maven/settings.xml
-
-  setup:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
     - name: Create .maven/settings.xml
       run: |
         mkdir -p .maven
@@ -47,3 +31,12 @@ jobs:
                   </server>
                 </servers>
               </settings>" > .maven/settings.xml
+
+    - name: Build with Maven
+      run: mvn clean install
+
+    - name: Deploy to Sonatype
+      env:
+        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+        SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+      run: mvn deploy -DskipTests --settings .maven/settings.xml
