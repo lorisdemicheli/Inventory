@@ -16,9 +16,9 @@ To implement with Maven add the dependency on your pom
 
 ```
 <dependency>
-  <groupId>com.github.lorisdemicheli</groupId>
+  <groupId>io.github.lorisdemicheli</groupId>
   <artifactId>inventory</artifactId>
-  <version>2.2.0</version>
+  <version>2.3</version>
 </dependency>
 ```
 
