@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory.util;
+package io.github.lorisdemicheli.inventory.util;
 
 public abstract class StringSearch {
 

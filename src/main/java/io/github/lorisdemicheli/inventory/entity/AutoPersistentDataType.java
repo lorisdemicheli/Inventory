@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory.entity;
+package io.github.lorisdemicheli.inventory.entity;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

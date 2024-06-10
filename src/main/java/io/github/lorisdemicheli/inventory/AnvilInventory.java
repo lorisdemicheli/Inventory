@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory;
+package io.github.lorisdemicheli.inventory;
 
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -6,8 +6,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import com.github.lorisdemicheli.inventory.util.BaseInventory;
-import com.github.lorisdemicheli.inventory.util.ReflectionUtils;
+import io.github.lorisdemicheli.inventory.util.BaseInventory;
+import io.github.lorisdemicheli.inventory.util.ReflectionUtils;
 
 public abstract class AnvilInventory extends AbstractBaseInventory {
 	

@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory.custom;
+package io.github.lorisdemicheli.inventory.custom;
 
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -6,10 +6,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.lorisdemicheli.inventory.ChestInventory;
-import com.github.lorisdemicheli.inventory.util.Ask;
-import com.github.lorisdemicheli.inventory.util.BaseInventory;
-import com.github.lorisdemicheli.inventory.util.CustomHead;
+import io.github.lorisdemicheli.inventory.ChestInventory;
+import io.github.lorisdemicheli.inventory.util.Ask;
+import io.github.lorisdemicheli.inventory.util.BaseInventory;
+import io.github.lorisdemicheli.inventory.util.CustomHead;
 
 public class AskInventory extends ChestInventory<Boolean> {
 	

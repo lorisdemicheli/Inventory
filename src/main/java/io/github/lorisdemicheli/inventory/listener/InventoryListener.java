@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory.listener;
+package io.github.lorisdemicheli.inventory.listener;
 
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -11,7 +11,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import com.github.lorisdemicheli.inventory.util.BaseInventory;
+import io.github.lorisdemicheli.inventory.util.BaseInventory;
 
 
 public class InventoryListener implements Listener {
