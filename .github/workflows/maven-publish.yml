@@ -22,7 +22,6 @@ jobs:
       - name: Setup GPG
         run: |
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          gpg --no-tty --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys $(gpg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2)
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
@@ -45,7 +44,7 @@ jobs:
                         <activeByDefault>true</activeByDefault>
                       </activation>
                       <properties>
-                        <gpg.executable>gpg</gpg.executable>
+                        <gpg.executable>gpg --no-tty</gpg.executable>
                       </properties>
                     </profile>
                   </profiles>
