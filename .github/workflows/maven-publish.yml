@@ -18,7 +18,7 @@ jobs:
         with:
           java-version: 1.8
           server-id: oss.sonatype.org
-          server-username: MAVEN_USERNAME
+          server-username: GPG_TEST_ERRATE
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
