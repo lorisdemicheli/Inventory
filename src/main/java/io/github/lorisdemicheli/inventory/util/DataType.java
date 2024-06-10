@@ -1,11 +1,11 @@
-package com.github.lorisdemicheli.inventory.util;
+package io.github.lorisdemicheli.inventory.util;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.persistence.PersistentDataType.PrimitivePersistentDataType;
 
-import com.github.lorisdemicheli.inventory.entity.AutoPersistentDataType;
+import io.github.lorisdemicheli.inventory.entity.AutoPersistentDataType;
 
 public class DataType {
 

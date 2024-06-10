@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory;
+package io.github.lorisdemicheli.inventory;
 
 import java.io.Serializable;
 import org.bukkit.Bukkit;
@@ -10,8 +10,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
-import com.github.lorisdemicheli.inventory.util.BaseInventory;
-import com.github.lorisdemicheli.inventory.util.DataType;
+import io.github.lorisdemicheli.inventory.util.BaseInventory;
+import io.github.lorisdemicheli.inventory.util.DataType;
 
 public abstract class ChestInventory<T extends Serializable> extends AbstractBaseInventory {
 

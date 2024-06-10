@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory.util;
+package io.github.lorisdemicheli.inventory.util;
 
 import java.util.List;
 import java.util.stream.Collectors;

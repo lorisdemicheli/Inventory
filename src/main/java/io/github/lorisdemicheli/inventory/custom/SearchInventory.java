@@ -1,14 +1,14 @@
-package com.github.lorisdemicheli.inventory.custom;
+package io.github.lorisdemicheli.inventory.custom;
 
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.lorisdemicheli.inventory.AnvilInventory;
-import com.github.lorisdemicheli.inventory.util.BaseInventory;
-import com.github.lorisdemicheli.inventory.util.ItemUtil;
-import com.github.lorisdemicheli.inventory.util.StringSearch;
+import io.github.lorisdemicheli.inventory.AnvilInventory;
+import io.github.lorisdemicheli.inventory.util.BaseInventory;
+import io.github.lorisdemicheli.inventory.util.ItemUtil;
+import io.github.lorisdemicheli.inventory.util.StringSearch;
 
 public class SearchInventory extends AnvilInventory {
 	

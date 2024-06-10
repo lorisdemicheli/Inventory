@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory;
+package io.github.lorisdemicheli.inventory;
 
 import java.io.Serializable;
 import java.util.List;
@@ -7,8 +7,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import com.github.lorisdemicheli.inventory.util.BaseInventory;
-import com.github.lorisdemicheli.inventory.util.CustomHead;
+import io.github.lorisdemicheli.inventory.util.BaseInventory;
+import io.github.lorisdemicheli.inventory.util.CustomHead;
 
 public abstract class PagedChestInventory<E extends Serializable> extends ChestInventory<E>{
 	

@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory;
+package io.github.lorisdemicheli.inventory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,12 +9,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import com.github.lorisdemicheli.inventory.custom.AskInventory;
-import com.github.lorisdemicheli.inventory.custom.SearchInventory;
-import com.github.lorisdemicheli.inventory.listener.InventoryListener;
-import com.github.lorisdemicheli.inventory.util.Ask;
-import com.github.lorisdemicheli.inventory.util.BaseInventory;
-import com.github.lorisdemicheli.inventory.util.StringSearch;
+import io.github.lorisdemicheli.inventory.custom.AskInventory;
+import io.github.lorisdemicheli.inventory.custom.SearchInventory;
+import io.github.lorisdemicheli.inventory.listener.InventoryListener;
+import io.github.lorisdemicheli.inventory.util.Ask;
+import io.github.lorisdemicheli.inventory.util.BaseInventory;
+import io.github.lorisdemicheli.inventory.util.StringSearch;
 
 public abstract class AbstractBaseInventory implements BaseInventory {
 	

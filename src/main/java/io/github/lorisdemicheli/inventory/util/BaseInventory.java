@@ -1,4 +1,4 @@
-package com.github.lorisdemicheli.inventory.util;
+package io.github.lorisdemicheli.inventory.util;
 
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;

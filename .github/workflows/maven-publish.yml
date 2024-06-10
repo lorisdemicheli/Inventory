@@ -10,38 +10,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up JDK 8
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: '8'
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          distribution: "adopt"
+          java-version: "8"
 
-    - name: Create .maven/settings.xml
-      run: |
-        mkdir -p .maven
-        echo "<settings>
-                <servers>
-                  <server>
-                    <id>sonatype-nexus-snapshots</id>
-                    <username>${{ secrets.SONATYPE_USERNAME }}</username>
-                    <password>${{ secrets.SONATYPE_PASSWORD }}</password>
-                  </server>
-                  <server>
-                    <id>sonatype-nexus-staging</id>
-                    <username>${{ secrets.SONATYPE_USERNAME }}</username>
-                    <password>${{ secrets.SONATYPE_PASSWORD }}</password>
-                  </server>
-                </servers>
-              </settings>" > .maven/settings.xml
+      - name: Setup GPG
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "$GPG_PRIVATE_KEY" | gpg --import-ownertrust
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
-    - name: Build with Maven
-      run: mvn clean install
+      - name: Create .maven/settings.xml
+        run: |
+          mkdir -p .maven
+          echo "<settings>
+                  <servers>
+                    <server>
+                      <id>central</id>
+                      <username>$SONATYPE_USERNAME</username>
+                      <password>$SONATYPE_PASSWORD</password>
+                      <passphrase>$GPG_PASSPHRASE</passphrase>
+                    </server>
+                  </servers>
+                  <profiles>
+                    <profile>
+                      <id>central</id>
+                      <activation>
+                        <activeByDefault>true</activeByDefault>
+                      </activation>
+                      <properties>
+                        <gpg.executable>gpg</gpg.executable>
+                      </properties>
+                    </profile>
+                  </profiles>
+                </settings>" > .maven/settings.xml
+        env:
+          SONATYPE_USERNAME: ${{secrets.SONATYPE_USERNAME}}
+          SONATYPE_PASSWORD: ${{secrets.SONATYPE_PASSWORD}}
+          GPG_PASSPHRASE: ${{secrets.GPG_PASSPHRASE}}
 
-    - name: Deploy to Sonatype
-      env:
-        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-        SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-      run: mvn deploy -Prelease -DskipTests --settings .maven/settings.xml
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Deploy to Sonatype
+        run: mvn clean deploy --settings .maven/settings.xml
