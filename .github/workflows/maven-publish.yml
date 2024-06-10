@@ -22,9 +22,7 @@ jobs:
       - name: Setup GPG
         run: |
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          echo "use-agent" >> ~/.gnupg/gpg.conf
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpg --no-tty --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys $(gpg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2)
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
@@ -37,6 +35,7 @@ jobs:
                       <id>central</id>
                       <username>$SONATYPE_USERNAME</username>
                       <password>$SONATYPE_PASSWORD</password>
+                      <passphrase>$GPG_PASSPHRASE</passphrase>
                     </server>
                   </servers>
                   <profiles>
@@ -47,8 +46,6 @@ jobs:
                       </activation>
                       <properties>
                         <gpg.executable>gpg</gpg.executable>
-                        <gpg.passphrase>${{ secrets.GPG_PASSPHRASE }}</gpg.passphrase>
-                        <gpg.use-agent>false</gpg.use-agent>
                       </properties>
                     </profile>
                   </profiles>
