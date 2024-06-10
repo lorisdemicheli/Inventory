@@ -37,7 +37,6 @@ jobs:
                       <id>central</id>
                       <username>$SONATYPE_USERNAME</username>
                       <password>$SONATYPE_PASSWORD</password>
-                      <passphrase>$GPG_PASSPHRASE</passphrase>
                     </server>
                   </servers>
                   <profiles>
@@ -48,6 +47,8 @@ jobs:
                       </activation>
                       <properties>
                         <gpg.executable>gpg</gpg.executable>
+                        <gpg.passphrase>${{ secrets.GPG_PASSPHRASE }}</gpg.passphrase>
+                        <gpg.use-agent>false</gpg.use-agent>
                       </properties>
                     </profile>
                   </profiles>
