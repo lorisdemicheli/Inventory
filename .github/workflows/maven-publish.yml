@@ -22,7 +22,6 @@ jobs:
       - name: Setup GPG
         run: |
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          echo "$GPG_PRIVATE_KEY" | gpg --import-ownertrust
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
