@@ -5,7 +5,8 @@ import java.lang.reflect.Field;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.persistence.PersistentDataType.PrimitivePersistentDataType;
 
-import io.github.lorisdemicheli.inventory.entity.AutoPersistentDataType;
+import io.github.lorisdemicheli.inventory.data.AutoPersistentDataType;
+
 
 public class DataType {
 
